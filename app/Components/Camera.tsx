@@ -52,6 +52,15 @@ export default function Camera() {
     }
   };
 
+  const deletePhoto = (index: number) => {
+    const newPhotos = photos.filter((_, i) => i !== index);
+    setPhotos(newPhotos);
+    localStorage.setItem('photos', JSON.stringify(newPhotos));
+    if (photo === photos[index]) {
+      setPhoto(null);
+    }
+  };
+
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -70,7 +79,26 @@ export default function Camera() {
       <h2>Saved Photos</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
         {photos.map((p, index) => (
-          <img key={index} src={p} alt={`Saved ${index}`} style={{ width: '150px' }} />
+          <div key={index} style={{ position: 'relative' }}>
+            <img src={p} alt={`Saved ${index}`} style={{ width: '150px' }} />
+            <button
+              onClick={() => deletePhoto(index)}
+              style={{
+                position: 'absolute',
+                top: '5px',
+                right: '5px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '25px',
+                height: '25px',
+                cursor: 'pointer',
+              }}
+            >
+              X
+            </button>
+          </div>
         ))}
       </div>
     </div>
