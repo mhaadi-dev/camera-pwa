@@ -8,25 +8,25 @@
     "background_color": "#ffffff",
     "icons": [
       {
-        "src": "/icons/photo-camera.png",
+        "src": "https://fastly.picsum.photos/id/870/200/300.jpg?blur=2&grayscale&hmac=ujRymp644uYVjdKJM7kyLDSsrqNSMVRPnGU99cKl6Vs",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any"
       },
       {
-        "src": "/icons/icon-512x512.png",
+        "src": "https://fastly.picsum.photos/id/870/200/300.jpg?blur=2&grayscale&hmac=ujRymp644uYVjdKJM7kyLDSsrqNSMVRPnGU99cKl6Vs",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "any"
       },
       {
-        "src": "/icons/photo-camera.png",
+        "src": "https://fastly.picsum.photos/id/870/200/300.jpg?blur=2&grayscale&hmac=ujRymp644uYVjdKJM7kyLDSsrqNSMVRPnGU99cKl6Vs",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "maskable"
       },
       {
-        "src": "/icons/icon-512x512.png",
+        "src": "https://fastly.picsum.photos/id/870/200/300.jpg?blur=2&grayscale&hmac=ujRymp644uYVjdKJM7kyLDSsrqNSMVRPnGU99cKl6Vs",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "maskable"
