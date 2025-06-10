@@ -1,35 +1,35 @@
 {
-  "name": "My PWA Camera App",
-  "short_name": "Camera PWA",
-  "description": "A PWA with camera and offline support",
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#FFFFFF",
-  "icons": [
-    {
-      "src": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&fm=png&w=192&h=192&fit=crop",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&fm=png&w=512&h=512&fit=crop",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&fm=png&w=192&h=192&fit=crop",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&fm=png&w=512&h=512&fit=crop",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
-}
+    "name": "My PWA Camera App",
+    "short_name": "Camera PWA",
+    "description": "A PWA with camera and offline support",
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "https://pwa-cam.netlify.app/icons/photo-camera.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "https://pwa-cam.netlify.app/icons/photo-camera.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "https://pwa-cam.netlify.app/icons/photo-camera.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "https://pwa-cam.netlify.app/icons/photo-camera.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      }
+    ]
+  }
