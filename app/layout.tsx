@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     { rel: 'apple-touch-icon', url: '/icons/photo-camera.png' },
     { rel: 'icon', url: '/icons/photo-camera.png' },
   ],
-  themeColor: '#000000',
+
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
