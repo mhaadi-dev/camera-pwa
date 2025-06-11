@@ -9,7 +9,6 @@ export default function Camera() {
   const [photos, setPhotos] = useState<{ url: string; coords: { lat: number; lng: number } }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -81,28 +80,16 @@ export default function Camera() {
     setPhotos(newList);
     localStorage.setItem("photos", JSON.stringify(newList));
 
-    // Attempt service worker notification
-    try {
-      if (Notification.permission !== "granted") {
-        await Notification.requestPermission();
-      }
+    if (Notification.permission !== "granted") {
+      await Notification.requestPermission();
+    }
 
-      if (Notification.permission === "granted" && "serviceWorker" in navigator) {
-        const reg = await navigator.serviceWorker.ready;
-        await reg.showNotification("Photo Saved", {
-          body: "Photo has been saved in local storage.",
-          icon: "/icons/icon-192x192.png",
-        });
-      } else {
-        // Fallback for iOS Safari or unsupported browsers
-        setNotification("Photo has been saved in local storage.");
-        setTimeout(() => setNotification(null), 3000); // Clear after 3 seconds
-      }
-    } catch (err) {
-      console.error("Notification error:", err);
-      // Fallback for iOS Safari or unsupported browsers
-      setNotification("Photo has been saved in local storage.");
-      setTimeout(() => setNotification(null), 3000); // Clear after 3 seconds
+    if (Notification.permission === "granted") {
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification("Photo Saved", {
+        body: "Photo has been saved in local storage.",
+        icon: "/icons/icon-192x192.png",
+      });
     }
   };
 
@@ -121,23 +108,6 @@ export default function Camera() {
         <p className="coords-text">
           <b>Current Location:</b> Lat: {coords.lat.toFixed(6)}, Lng: {coords.lng.toFixed(6)}
         </p>
-      )}
-
-      {notification && (
-        <div
-          style={{
-            position: "fixed",
-            top: "20px",
-            right: "20px",
-            padding: "10px 20px",
-            background: "#4caf50",
-            color: "#fff",
-            borderRadius: "4px",
-            zIndex: 1000,
-          }}
-        >
-          {notification}
-        </div>
       )}
 
       <video ref={videoRef} autoPlay className="video-feed" />
@@ -162,6 +132,7 @@ export default function Camera() {
             {photos.map((p, i) => (
               <div key={i} className="photo-item">
                 <img src={p.url} alt={`Saved ${i}`} className="photo-img" />
+             
                 <button className="delete-photo-btn" onClick={() => deletePhoto(i)}>
                   ×
                 </button>
