@@ -5,7 +5,7 @@ import { PushNotificationManager } from "./Components/PushNotificationManager";
 export default function Home() {
   return (
     <main>
-      <h1>My PWA Camera App</h1>
+      <h1 style={{textAlign:"center", background:"black", color:"white",padding:"1rem",borderRadius:"10px"}}>PWA Camera App</h1>
       <Camera />
       <InstallPrompt/>
       <PushNotificationManager/>

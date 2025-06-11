@@ -14,6 +14,8 @@ export default function InstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
+
+  
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();

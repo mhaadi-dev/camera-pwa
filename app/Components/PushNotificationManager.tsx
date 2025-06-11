@@ -1,159 +1,101 @@
-// "use client"
 
-// import { useEffect, useState } from "react"
-
-// function urlBase64ToUint8Array(base64String: string) {
-//   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-//   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-
-//   const rawData = window.atob(base64)
-//   const outputArray = new Uint8Array(rawData.length)
-
-//   for (let i = 0; i < rawData.length; ++i) {
-//     outputArray[i] = rawData.charCodeAt(i)
-//   }
-//   return outputArray
-// }
-
-// export function PushNotificationManager() {
-//   const [isSupported, setIsSupported] = useState(false)
-//   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
-//   const [message, setMessage] = useState("")
-
-//   useEffect(() => {
-//     if ("serviceWorker" in navigator && "PushManager" in window) {
-//       setIsSupported(true)
-//       registerServiceWorker()
-//     }
-//   }, [])
-
-//   async function registerServiceWorker() {
-//     try {
-//       const registration = await navigator.serviceWorker.register("/sw.js", {
-//         scope: "/",
-//         updateViaCache: "none",
-//       })
-//       const sub = await registration.pushManager.getSubscription()
-//       setSubscription(sub)
-//     } catch (error) {
-//       console.error("Service Worker registration failed:", error)
-//     }
-//   }
-
-//   async function subscribeToPush() {
-//     try {
-//       const registration = await navigator.serviceWorker.ready
-//       const sub = await registration.pushManager.subscribe({
-//         userVisibleOnly: true,
-//         applicationServerKey: urlBase64ToUint8Array(
-//           process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-//         ),
-//       })
-//       setSubscription(sub)
-
-//       // Call your Next.js API route to save subscription server-side
-//       await fetch("/api/push/subscribe", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(sub.toJSON()),
-//       })
-//     } catch (error) {
-//       console.error("Subscription failed:", error)
-//     }
-//   }
-
-//   async function unsubscribeFromPush() {
-//     try {
-//       if (!subscription) return
-//       await subscription.unsubscribe()
-//       setSubscription(null)
-
-//       // Notify server to remove subscription
-//       await fetch("/api/push/unsubscribe", { method: "POST" })
-//     } catch (error) {
-//       console.error("Unsubscribe failed:", error)
-//     }
-//   }
-
-//   async function sendTestNotification() {
-//     if (!subscription) return
-
-//     try {
-//       await fetch("/api/push/send", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ message }),
-//       })
-//       setMessage("")
-//     } catch (error) {
-//       console.error("Sending notification failed:", error)
-//     }
-//   }
-
-//   if (!isSupported) {
-//     return <p>Push notifications are not supported in this browser.</p>
-//   }
-
-//   return (
-//     <div>
-//       <h3>Push Notifications</h3>
-//       {subscription ? (
-//         <>
-//           <p>You are subscribed to push notifications.</p>
-//           <button onClick={unsubscribeFromPush}>Unsubscribe</button>
-//           <input
-//             type="text"
-//             placeholder="Enter notification message"
-//             value={message}
-//             onChange={(e) => setMessage(e.target.value)}
-//           />
-//           <button onClick={sendTestNotification} disabled={!message.trim()}>
-//             Send Test
-//           </button>
-//         </>
-//       ) : (
-//         <>
-//           <p>You are not subscribed to push notifications.</p>
-//           <button onClick={subscribeToPush}>Subscribe</button>
-//         </>
-//       )}
-//     </div>
-//   )
-// }
-'use client';
-import { useEffect } from 'react';
-import { app } from '../lib/firebase';
+//@ts-nocheck
+"use client";
+import { useEffect, useState } from "react";
+import { app } from "../lib/firebase";
 
 export function PushNotificationManager() {
-  useEffect(() => {
-    if (
-      typeof window === 'undefined' ||
-      !('serviceWorker' in navigator)
-    )
-      return;
+  const [token, setToken] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-    import('firebase/messaging').then(({ getMessaging, getToken, onMessage }) => {
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+      setError("Push notifications are not supported in this browser.");
+      setStatus("error");
+      return;
+    }
+
+    // Register service worker
+    const registerServiceWorker = async () => {
+      try {
+        const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+          scope: "/",
+          updateViaCache: "none",
+        });
+        console.log("Service Worker registered:", registration);
+      } catch (err) {
+        console.error("Service Worker registration failed:", err);
+        setError("Failed to register service worker.");
+        setStatus("error");
+      }
+    };
+
+    registerServiceWorker();
+
+    // Initialize Firebase Messaging
+    import("firebase/messaging").then(({ getMessaging, getToken, onMessage }) => {
       const messaging = getMessaging(app);
 
-      Notification.requestPermission().then(permission => {
-        if (permission !== 'granted') return;
+      const requestToken = async () => {
+        setStatus("loading");
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") {
+            setError("Notification permission denied. Please allow notifications in browser settings.");
+            setStatus("error");
+            return;
+          }
 
-        getToken(messaging, {
-          vapidKey:process.env.NEXT_PUBLIC_VAPID_KEY,
-        }).then(token => {
-          console.log('FCM token:', token);
-          localStorage.setItem('fcm_token', token);
-        });
-      });
+          const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY;
+          if (!vapidKey) {
+            throw new Error("VAPID key is not set in environment variables.");
+          }
 
-      onMessage(messaging, payload => {
-        console.log('Foreground message:', payload);
-        new Notification(payload.notification?.title || 'Notification', {
+          const currentToken = await getToken(messaging, { vapidKey });
+          if (currentToken) {
+            console.log("FCM token:", currentToken);
+            setToken(currentToken);
+            localStorage.setItem("fcm_token", currentToken);
+            setStatus("success");
+
+            // Send token to your server (optional)
+            await fetch("/api/push/subscribe", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: currentToken }),
+            });
+          } else {
+            setError("No registration token available. Please try again.");
+            setStatus("error");
+          }
+        } catch (err) {
+          console.error("Error getting FCM token:", err);
+          setError(`Failed to get FCM token: ${err.message || "Unknown error."}`);
+          setStatus("error");
+        }
+      };
+
+      requestToken();
+
+      // Handle foreground messages
+      onMessage(messaging, (payload) => {
+        console.log("Foreground message:", payload);
+        new Notification(payload.notification?.title || "Notification", {
           body: payload.notification?.body,
+          icon: payload.notification?.icon,
         });
       });
     });
   }, []);
 
-  return null;
+  // Optional UI for debugging/testing
+  return (
+    < >
+    
+    </>
+  );
+
+  // Alternative: Keep silent component (uncomment to use)
+  // return null;
 }
