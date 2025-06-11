@@ -6,6 +6,13 @@ export default function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(true);
 
   useEffect(() => {
+    // Check if prompt was previously dismissed
+    const isDismissed = localStorage.getItem('installPromptDismissed');
+    if (isDismissed) {
+      setShowPrompt(false);
+      return;
+    }
+
     const handler = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -14,8 +21,6 @@ export default function InstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-
-  
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -27,7 +32,14 @@ export default function InstallPrompt() {
       }
       setDeferredPrompt(null);
       setShowPrompt(false);
+      localStorage.setItem('installPromptDismissed', 'true');
     }
+  };
+
+  const handleDismissClick = () => {
+    setShowPrompt(false);
+    setDeferredPrompt(null);
+    localStorage.setItem('installPromptDismissed', 'true');
   };
 
   if (!showPrompt || !deferredPrompt) return null;
@@ -35,7 +47,8 @@ export default function InstallPrompt() {
   return (
     <div style={{ position: 'fixed', bottom: '20px', right: '20px', padding: '10px', background: '#fff', border: '1px solid #ccc' }}>
       <p>Install this app for a better experience!</p>
-      <button onClick={handleInstallClick}>Install</button>
+      <button onClick={handleInstallClick} style={{ marginRight: '10px' }}>Install</button>
+      <button onClick={handleDismissClick}>Dismiss</button>
     </div>
   );
 }
