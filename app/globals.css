@@ -71,10 +71,12 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 5px;
+  width: 200px;
+
 }
 
 .photo-img {
-  width: 150px;
+  width: 100%;
   height: auto;
   border-radius: 5px;
   display: block;
